@@ -8,7 +8,7 @@ class Vehicle {
     this.maxForce = 0.4;
     this.r = 16;
     this.rayonZoneDeFreinage = 200;
-    this.perceptionRadius=24;
+    this.perceptionRadius=100;
     this.leader=leader;
     if (this.leader) {
       this.color = color("#FF0000"); // Set leader color
@@ -19,7 +19,7 @@ class Vehicle {
   }
 
   align(boids) {
-    let perceptionRadius = 25;
+    let perceptionRadius = 100;
     let steering = createVector();
     let total = 0;
     for (let other of boids) {
@@ -38,6 +38,26 @@ class Vehicle {
     return steering;
   }
 
+  cohesion(boids) {
+    let perceptionRadius = 100;
+    let steering = createVector();
+    let total = 0;
+    for (let other of boids) {
+      let d = dist(this.pos.x, this.pos.y, other.pos.x, other.pos.y);
+      if (other != this && d < perceptionRadius) {
+        steering.add(other.pos);
+        total++;
+      }
+    }
+    if (total > 0) {
+      steering.div(total);
+      steering.sub(this.position);
+      steering.setMag(this.maxSpeed);
+      steering.sub(this.vel);
+      steering.limit(this.maxForce);
+    }
+    return steering;
+  }
   /*getBehindPosition() {
     // Calculate a vector in the opposite direction of the vehicle's heading
     let behindVector = p5.Vector.sub(this.pos, this.vel.copy().setMag(2));
@@ -170,7 +190,7 @@ class Vehicle {
     }
   }
   separation(boids) {
-    
+    this.perceptionRadius=100;
     let steering = createVector();
     let total = 0;
     for (let other of boids) {
